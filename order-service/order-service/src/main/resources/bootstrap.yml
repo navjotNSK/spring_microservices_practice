@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: ORDER-SERVICE
+  cloud:
+    config:
+      uri:
+        - http://localhost:9196

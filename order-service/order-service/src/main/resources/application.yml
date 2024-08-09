@@ -1,0 +1,72 @@
+server:
+  port: 9192
+spring:
+#  zipkin:
+#    base-url: http://localhost:9411/
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  application:
+    name: ORDER-SERVICE
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      default-zone: http://localhost:8761/eureka/
+#  instance:
+#    hostname: localhost
+  instance:
+    prefer-ip-address: true
+#    ipAddress: 127.0.0.1
+#    instanceId: localhost:${spring.application.name}:${server.port}
+#    appname: ${spring.application.name}
+logging:
+  file: C:/Users/Basant.Hota/Desktop/oms.log
+
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:  hystrix.stream, health, info
+  endpoint:
+    health:
+      show-details: always
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      Order-Service:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+
+
+  retry:
+    instances:
+      Order-Service:
+        maxRetryAttempts: 5
+        waitDuration: 10s
+
+
+

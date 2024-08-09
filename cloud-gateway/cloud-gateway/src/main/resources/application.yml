@@ -1,0 +1,85 @@
+server:
+  port: 8989
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: order-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/order/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: ORDER-SERVICE
+                fallbackUri: forward:/orderFallBack
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: PAYMENT-SERVICE
+                fallbackUri: forward:/paymentFallBack
+    discovery:
+      locator:
+        lower-case-service-id: true
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      default-zone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true
+    ipAddress: 127.0.0.1
+    instanceId: localhost:${spring.application.name}:${server.port}
+    appname: ${spring.application.name}
+
+#Hystrix Configuration
+#hystrix:
+#  command:
+#    fallbackcmd:
+#      execution:
+#        isolation:
+#          thread:
+#            timeoutInMilliseconds: 4000
+
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:  hystrix.stream, health, info
+  endpoint:
+    health:
+      show-details: always
+
+
+#resilience4j:
+#  circuitbreaker:
+#    instances:
+#      cloud-gateway:
+#        registerHealthIndicator: true
+#        eventConsumerBufferSize: 10
+#        failureRateThreshold: 50
+#        minimumNumberOfCalls: 5
+#        automaticTransitionFromOpenToHalfOpenEnabled: true
+#        waitDurationInOpenState: 5s
+#        permittedNumberOfCallsInHalfOpenState: 3
+#        slidingWindowSize: 10
+#        slidingWindowType: COUNT_BASED
+#
+#
+#  retry:
+#    instances:
+#      userService:
+#        maxRetryAttempts: 5
+#        waitDuration: 10s
+

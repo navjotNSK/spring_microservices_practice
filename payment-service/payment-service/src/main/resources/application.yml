@@ -1,0 +1,34 @@
+server:
+  port: 9191
+spring:
+  zipkin:
+    base-url: http://localhost:9411/
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  application:
+    name: PAYMENT-SERVICE
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      default-zone: http://localhost:8761/eureka/
+#  instance:
+#    hostname: localhost
+  instance:
+    prefer-ip-address: true
+    ipAddress: 127.0.0.1
+    instanceId: localhost:${spring.application.name}:${server.port}
+    appname: ${spring.application.name}
+logging:
+  file: C:/Users/Basant.Hota/Desktop/oms.log
